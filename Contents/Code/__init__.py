@@ -801,6 +801,8 @@ class TVDBAgent(Agent.TV_Shows):
     for actor in mal_actor_metadata.items():
       if 'Characters' in actor:
         for a in actor[1]:
+          Log("#######a##########")
+          Log(a)
           if 'actors' in a:
             for b in a['actors']:
               if b['language'].lower() == lang.lower():
