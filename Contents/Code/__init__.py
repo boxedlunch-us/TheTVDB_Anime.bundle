@@ -546,7 +546,7 @@ class TVDBAgent(Agent.TV_Shows):
     series_name = series_data.get('seriesName', '')
     series_lang = lang
     Log('Scoring result: %s (%s)' % (series_name, series_id))
-    
+
     if series_name.lower().strip() == media.show.lower().strip():
       score += 10
     elif series_name[:series_name.rfind('(')].lower().strip() == media.show.lower().strip():
@@ -803,15 +803,15 @@ class TVDBAgent(Agent.TV_Shows):
       if 'Characters' in actor:
         for a in actor[1]:
 
-          if 'actors' in a and b['language'].lower() == 'English'.lower():
+          if 'actors' in a:
 
             for b in a['actors']:
-
-              character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
-                                    'image': b['image'],
-                                    'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
-                                    'sortOrder': 0, 'id': a['id']}
-              transposed_actors.append(character_metadata)
+              if b['language'].lower() == 'English'.lower():
+                  character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
+                                        'image': b['image'],
+                                        'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
+                                        'sortOrder': 0, 'id': a['id']}
+                  transposed_actors.append(character_metadata)
           else:
             character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(a['name'].split(', '))),
                                   'image': b['image'],
@@ -835,14 +835,14 @@ class TVDBAgent(Agent.TV_Shows):
       Log("Bad series data, no update for TVDB id: %s (lang: %s)" % (metadata.id, lang))
       # TODO: Add function to search TMDb by name
       pass
-      
+
     # Find TheMovieDB match.
     try:
       TMDB_BASE_URL = 'http://127.0.0.1:32400/services/tmdb?uri=%s'
       url = '/find/' + metadata.id + '?external_source=tvdb_id'
       tmdb_dict = JSON.ObjectFromURL(TMDB_BASE_URL % String.Quote(url, True), sleep=2.0, headers={'Accept': 'application/json'}, cacheTime=0 if force else CACHE_1MONTH)
       tmdb_id = tmdb_dict['tv_results'][0]['id']
-      
+
       url = '/tv/%s/recommendations' % tmdb_id
       tmdb_dict = JSON.ObjectFromURL(TMDB_BASE_URL % String.Quote(url, True), sleep=2.0, headers={'Accept': 'application/json'}, cacheTime=0 if force else CACHE_1MONTH)
 
