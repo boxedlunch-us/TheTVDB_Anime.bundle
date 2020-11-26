@@ -807,6 +807,10 @@ class TVDBAgent(Agent.TV_Shows):
             Log("###ACTORS IN A???#####")
             Log('actors' in a)
             for b in a['actors']:
+              Log("###B IS FOR BULLSHIT#####")
+              Log(lang)
+              Log(b)
+              Log(b['language'].lower() == lang.lower())
               if b['language'].lower() == lang.lower():
                 character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
                                       'image': a['image'],
