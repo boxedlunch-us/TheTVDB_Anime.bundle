@@ -798,17 +798,18 @@ class TVDBAgent(Agent.TV_Shows):
 
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
     Log(mal_actor_metadata)
+    Log(mal_actor_metadata['Characters'])
     for actor in mal_actor_metadata['Characters']:
       if 'actors' in actor:
         for a in actor['actors']:
           if a['language'].lower() == lang.lower():
-            character_metadata = {'seriesId': str(series_id), 'name': 'Kazuyuki Okitsu',
+            character_metadata = {'seriesId': 357488, 'name': 'Kazuyuki Okitsu',
                                   'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
                                   'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
                                   'imageAdded': '2020-09-19 07:30:29'}
       else:
 
-        character_metadata = {'seriesId': str(series_id), 'name': 'Kazuyuki Okitsu',
+        character_metadata = {'seriesId': 357488, 'name': 'Kazuyuki Okitsu',
                               'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
                               'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
                               'imageAdded': '2020-09-19 07:30:29'}
