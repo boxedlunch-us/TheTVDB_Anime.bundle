@@ -849,9 +849,10 @@ class TVDBAgent(Agent.TV_Shows):
       return
     Log("MOTHERFUCKING METADATA ID:" + metadata.id)
     actor_data = None
+    self.transpose_cast(metadata.title, lang, metadata.id)
     try:
       actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
-      actor_data3 = self.transpose_cast(metadata.title, lang, metadata.id)
+
       # Log("asdfasdf: %s" + actor_data)
       # Log("rolez: %s" % metadata.roles)
     except Exception, e:
