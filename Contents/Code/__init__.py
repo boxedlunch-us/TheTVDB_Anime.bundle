@@ -799,9 +799,9 @@ class TVDBAgent(Agent.TV_Shows):
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
     Log(mal_actor_metadata)
     Log(mal_actor_metadata['Characters'])
-    for actor in mal_actor_metadata['Characters']:
+    for actor in mal_actor_metadata.get('Characters'):
       Log("ACTOR1#######" + actor)
-      if 'actors' in actor:
+      if 'actors' in actor.keys():
         Log("ACTOR2#######" + actor)
         for a in actor['actors']:
           Log("ACTOR3#######" + a)
