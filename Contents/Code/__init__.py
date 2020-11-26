@@ -221,7 +221,8 @@ def metadata_people(people_list, meta_people_obj):
         new_person_obj = meta_people_obj.new()
         new_person_obj.name = person.get('name', '')
         new_person_obj.role = person.get('role', '')
-        new_person_obj.photo = TVDB_IMG_ROOT % person.get('image', '')
+        # TODO: enable photos from tvdb in place of MAL as a fallback
+        new_person_obj.photo = person.get('image', '')
 
   except Exception, e:
     pass
@@ -803,20 +804,15 @@ class TVDBAgent(Agent.TV_Shows):
         for a in actor[1]:
           Log("#######a##########")
           Log(a)
-          if 'actors' in a:
-            Log("###ACTORS IN A???#####")
-            Log('actors' in a)
+          if 'actors' in a and 'en' == lang.lower():
+
             for b in a['actors']:
-              Log("###B IS FOR BULLSHIT#####")
-              Log(lang)
-              Log(b)
-              Log(b['language'].lower() == lang.lower())
-              if 'en' == lang.lower():
-                character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
-                                      'image': a['image'],
-                                      'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
-                                      'sortOrder': 0, 'id': a['id']}
-                transposed_actors.append(character_metadata)
+
+              character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
+                                    'image': a['image'],
+                                    'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
+                                    'sortOrder': 0, 'id': a['id']}
+              transposed_actors.append(character_metadata)
           else:
             character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(a['name'].split(', '))),
                                   'image': a['image'],
