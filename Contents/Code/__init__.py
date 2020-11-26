@@ -797,13 +797,11 @@ class TVDBAgent(Agent.TV_Shows):
     mal_actor_searchUrl = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_CAST.format(id=mal_id)
 
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
-    Log(mal_actor_metadata)
-    Log(mal_actor_metadata['Characters'])
-    for actor in mal_actor_metadata.get('Characters'):
-      Log("ACTOR1#######" + actor)
-      if 'actors' in actor.keys():
-        Log("ACTOR2#######" + actor)
-        for a in actor['actors']:
+    for asdf in mal_actor_metadata.get('Characters'):
+      Log("ACTOR1#######" + asdf)
+      if 'actors' in asdf.keys():
+        Log("ACTOR2#######" + asdf)
+        for a in asdf['actors']:
           Log("ACTOR3#######" + a)
           if a['language'].lower() == lang.lower():
             Log("LOWER#######" + a['language'].lower() + lang.lower())
