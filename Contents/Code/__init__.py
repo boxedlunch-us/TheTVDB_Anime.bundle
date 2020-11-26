@@ -866,8 +866,8 @@ class TVDBAgent(Agent.TV_Shows):
     try:
       # actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
       actor_data = self.transpose_cast(metadata.title, lang, str(metadata.id))
-      Log("asdfasdf: %s" % actor_data)
-      Log("rolez: %s" % metadata.roles)
+      # Log("asdfasdf: %s" + actor_data)
+      # Log("rolez: %s" % metadata.roles)
     except Exception, e:
       Log("Bad actor data, no update for TVDB id: %s" % metadata.id)
 
