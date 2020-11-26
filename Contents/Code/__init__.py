@@ -271,6 +271,7 @@ class TVDBAgent(Agent.TV_Shows):
         if pct > minPercentThreshold:
           try:
             series_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_SERIES_URL % (guid, lang), additionalHeaders={'Accept-Language': lang}))['data']
+            Log("####LOG SERIES DATA#####")
             Log(series_data)
             name = series_data['seriesName']
 
