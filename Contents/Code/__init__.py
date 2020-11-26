@@ -802,20 +802,19 @@ class TVDBAgent(Agent.TV_Shows):
     for actor in mal_actor_metadata.items():
       if 'Characters' in actor:
         for a in actor[1]:
-          Log("#######a##########")
-          Log(a)
+
           if 'actors' in a and 'en' == lang.lower():
 
             for b in a['actors']:
 
               character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
-                                    'image': a['image'],
+                                    'image': b['image'],
                                     'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
                                     'sortOrder': 0, 'id': a['id']}
               transposed_actors.append(character_metadata)
           else:
             character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(a['name'].split(', '))),
-                                  'image': a['image'],
+                                  'image': b['image'],
                                   'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
                                   'sortOrder': 0, 'id': a['id']}
 
