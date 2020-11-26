@@ -788,7 +788,6 @@ class TVDBAgent(Agent.TV_Shows):
 
     Log('%s - Added %d of %d extras.' % (ivaNormTitle, len(extras), len(xml.xpath('./extra'))))
   def transpose_cast(self, title, lang, series_id):
-    transposed_actors = []
     mal_search_url = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_SEARCH.format(title=String.Quote(title, usePlus=True))
 
     mal_data = JSON.ObjectFromString(HTTP.Request(mal_search_url, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
@@ -799,7 +798,7 @@ class TVDBAgent(Agent.TV_Shows):
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
     transposed_actors = []
 
-    for actor in mal_actor_metadata.items():
+    for actor in mal_actor_data.items():
       if 'Characters' in actor:
         for a in actor[1]:
           if 'actors' in a:
@@ -809,13 +808,15 @@ class TVDBAgent(Agent.TV_Shows):
                                       'image': a['image'],
                                       'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
                                       'sortOrder': 0, 'id': a['id']}
-                transposed_actors.append(character_metadata)
+
           else:
             character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(a['name'].split(', '))),
                                   'image': a['image'],
                                   'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
                                   'sortOrder': 0, 'id': a['id']}
-            transposed_actors.append(character_metadata)
+
+          transposed_actors.append(character_metadata)
+
 
     return transposed_actors
 
