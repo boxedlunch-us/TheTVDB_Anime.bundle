@@ -789,7 +789,7 @@ class TVDBAgent(Agent.TV_Shows):
 
     Log('%s - Added %d of %d extras.' % (ivaNormTitle, len(extras), len(xml.xpath('./extra'))))
   def transpose_cast(self, title, lang, series_id):
-    mal_search_url = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_SEARCH.format(title=String.Quote(title, usePlus=True))
+    mal_search_url = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_SEARCH.format(title=String.Quote(str(title), usePlus=True))
 
     mal_data = JSON.ObjectFromString(HTTP.Request(mal_search_url, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
 
