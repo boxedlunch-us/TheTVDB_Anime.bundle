@@ -798,7 +798,7 @@ class TVDBAgent(Agent.TV_Shows):
 
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
     for actor in mal_actor_metadata.iteritems():
-      Log("ACTOR: " + actor)
+      Log("ACTOR: " + actor.__str__())
     return transposed_actors
 
   def update(self, metadata, media, lang, force=False):
