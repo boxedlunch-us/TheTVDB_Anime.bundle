@@ -379,6 +379,7 @@ class TVDBAgent(Agent.TV_Shows):
   def exact_tvdb_match(self, mediaShowYear, media, results, lang='en'):
     Log('Searching for exact match with: %s (lang: %s)' % (mediaShowYear, lang))
     series_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_SEARCH_URL % mediaShowYear, additionalHeaders={'Accept-Language': lang}, cacheTime=0))['data'][0]
+    Log(series_data)
     series_name = series_data['seriesName']
     return self.ParseSeries(media, series_data, lang, results, 80)
 
