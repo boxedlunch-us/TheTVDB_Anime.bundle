@@ -1,3 +1,8 @@
+Summary
+-------
+
+This plug-in is a work in progress; it provides dub voice actor information for anime.  Currently only works upon metadata refresh or manual match/search.
+
 License
 -------
 
