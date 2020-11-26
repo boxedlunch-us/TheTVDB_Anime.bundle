@@ -802,15 +802,16 @@ class TVDBAgent(Agent.TV_Shows):
       if 'actors' in actor:
         for a in actor['actors']:
           if a['language'].lower() == lang.lower():
-            character_metadata = {'seriesId': series_id, 'name': ' '.join(reversed(a['name'].split(', '))),
-                                  'image': a['image'],
-                                  'imageAuthor': None, 'role': ' '.join(reversed(actor['name'].split(', '))),
-                                  'sortOrder': 0, 'id': actor['id']}
+            character_metadata = {'seriesId': str(series_id), 'name': 'Kazuyuki Okitsu',
+                                  'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
+                                  'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
+                                  'imageAdded': '2020-09-19 07:30:29'}
       else:
-        character_metadata = {'seriesId': series_id, 'name': ' '.join(reversed(actor['name'].split(', '))),
-                              'image': actor['image'],
-                              'imageAuthor': None, 'role': ' '.join(reversed(actor['name'].split(', '))),
-                              'sortOrder': 0, 'id': actor['id']}
+
+        character_metadata = {'seriesId': str(series_id), 'name': 'Kazuyuki Okitsu',
+                              'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
+                              'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
+                              'imageAdded': '2020-09-19 07:30:29'}
 
       transposed_actors.append(character_metadata)
     return transposed_actors
