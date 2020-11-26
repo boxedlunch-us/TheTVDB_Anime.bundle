@@ -797,8 +797,26 @@ class TVDBAgent(Agent.TV_Shows):
     mal_actor_searchUrl = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_CAST.format(id=mal_id)
 
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
-    for actor in mal_actor_metadata.iteritems():
-      Log("ACTOR: " + actor.__str__())
+    transposed_actors = []
+
+    for actor in mal_actor_metadata.items():
+      if 'Characters' in actor:
+        for a in actor[1]:
+          if 'actors' in a:
+            for b in a['actors']:
+              if b['language'].lower() == lang.lower():
+                character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
+                                      'image': a['image'],
+                                      'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
+                                      'sortOrder': 0, 'id': a['id']}
+
+          else:
+            character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(a['name'].split(', '))),
+                                  'image': a['image'],
+                                  'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
+                                  'sortOrder': 0, 'id': a['id']}
+
+      transposed_actors.append(character_metadata)
     return transposed_actors
 
   def update(self, metadata, media, lang, force=False):
@@ -851,8 +869,8 @@ class TVDBAgent(Agent.TV_Shows):
     actor_data = None
     self.transpose_cast(metadata.title, lang, metadata.id)
     try:
-      actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
-
+      # actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
+      actor_data = self.transpose_cast(metadata.title, lang, metadata.id)
       # Log("asdfasdf: %s" + actor_data)
       # Log("rolez: %s" % metadata.roles)
     except Exception, e:
