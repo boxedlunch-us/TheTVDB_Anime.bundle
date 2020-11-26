@@ -811,7 +811,7 @@ class TVDBAgent(Agent.TV_Shows):
               Log(lang)
               Log(b)
               Log(b['language'].lower() == lang.lower())
-              if b['language'].lower() == lang.lower():
+              if 'en' == lang.lower():
                 character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
                                       'image': a['image'],
                                       'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
