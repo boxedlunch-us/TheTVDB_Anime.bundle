@@ -797,28 +797,8 @@ class TVDBAgent(Agent.TV_Shows):
     mal_actor_searchUrl = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_CAST.format(id=mal_id)
 
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
-    for asdf in mal_actor_metadata.get('Characters'):
-      Log("ACTOR1#######" + asdf)
-      if 'actors' in asdf.keys():
-        Log("ACTOR2#######" + asdf)
-        for a in asdf['actors']:
-          Log("ACTOR3#######" + a)
-          if a['language'].lower() == lang.lower():
-            Log("LOWER#######" + a['language'].lower() + lang.lower())
-            character_metadata = {'seriesId': 357488, 'name': 'Kazuyuki Okitsu',
-                                  'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
-                                  'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
-                                  'imageAdded': '2020-09-19 07:30:29'}
-            Log(character_metadata)
-      else:
-
-        character_metadata = {'seriesId': 357488, 'name': 'Kazuyuki Okitsu',
-                              'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
-                              'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
-                              'imageAdded': '2020-09-19 07:30:29'}
-        Log(character_metadata)
-      transposed_actors.append(character_metadata)
-      Log(transposed_actors)
+    for actor in mal_actor_metadata.iteritems():
+      Log("ACTOR: " + actor)
     return transposed_actors
 
   def update(self, metadata, media, lang, force=False):
@@ -870,8 +850,8 @@ class TVDBAgent(Agent.TV_Shows):
     Log("MOTHERFUCKING METADATA ID:" + metadata.id)
     actor_data = None
     try:
-      # actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
-      actor_data = self.transpose_cast(metadata.title, lang, metadata.id)
+      actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
+      actor_data3 = self.transpose_cast(metadata.title, lang, metadata.id)
       # Log("asdfasdf: %s" + actor_data)
       # Log("rolez: %s" % metadata.roles)
     except Exception, e:
