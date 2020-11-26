@@ -861,7 +861,7 @@ class TVDBAgent(Agent.TV_Shows):
       Log("Bad English series data, no update for TVDB id: %s" % metadata.id)
       # TODO: Add function to search TMDb by name
       return
-
+    Log("MOTHERFUCKING METADATA ID:" % metadata.id)
     actor_data = None
     try:
       # actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
