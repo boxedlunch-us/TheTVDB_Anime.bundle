@@ -803,7 +803,7 @@ class TVDBAgent(Agent.TV_Shows):
       if 'Characters' in actor:
         for a in actor[1]:
 
-          if 'actors' in a and 'en' == lang.lower():
+          if 'actors' in a and b['language'].lower() == 'English'.lower():
 
             for b in a['actors']:
 
