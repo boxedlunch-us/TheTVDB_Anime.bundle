@@ -798,7 +798,7 @@ class TVDBAgent(Agent.TV_Shows):
     mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
     transposed_actors = []
 
-    for actor in mal_actor_data.items():
+    for actor in mal_actor_metadata.items():
       if 'Characters' in actor:
         for a in actor[1]:
           if 'actors' in a:
