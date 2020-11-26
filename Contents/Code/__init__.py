@@ -800,21 +800,27 @@ class TVDBAgent(Agent.TV_Shows):
     Log(mal_actor_metadata)
     Log(mal_actor_metadata['Characters'])
     for actor in mal_actor_metadata['Characters']:
+      Log("ACTOR1#######" + actor)
       if 'actors' in actor:
+        Log("ACTOR2#######" + actor)
         for a in actor['actors']:
+          Log("ACTOR3#######" + a)
           if a['language'].lower() == lang.lower():
+            Log("LOWER#######" + a['language'].lower() + lang.lower())
             character_metadata = {'seriesId': 357488, 'name': 'Kazuyuki Okitsu',
                                   'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
                                   'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
                                   'imageAdded': '2020-09-19 07:30:29'}
+            Log(character_metadata)
       else:
 
         character_metadata = {'seriesId': 357488, 'name': 'Kazuyuki Okitsu',
                               'image': 'person/292929/5f65b39682f6b.jpg', 'lastUpdated': '2020-09-19 07:30:29',
                               'imageAuthor': None, 'role': 'Hatori Soma ', 'sortOrder': 0, 'id': 64848679,
                               'imageAdded': '2020-09-19 07:30:29'}
-
+        Log(character_metadata)
       transposed_actors.append(character_metadata)
+      Log(transposed_actors)
     return transposed_actors
 
   def update(self, metadata, media, lang, force=False):
