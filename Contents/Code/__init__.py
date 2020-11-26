@@ -10,6 +10,16 @@ META_TVDB_GUID_SEARCH = '%s/tv/guid/' % META_HOST
 META_TVDB_QUICK_SEARCH = '%s/tv/names/' % META_HOST
 META_TVDB_TITLE_SEARCH = '%s/tv/titles/' % META_HOST
 
+# MAL
+
+MYANIMELIST_URL_MAIN = "https://atarashii.fribbtastic.net"
+MYANIMELIST_URL_SEARCH = "/web/2.1/anime/search?q={title}"
+MYANIMELIST_URL_DETAILS = "/web/2.1/anime/{id}"
+MYANIMELIST_URL_CAST = "/web/2.1/anime/cast/{id}"
+MYANIMELIST_URL_EPISODES = "/web/2.1/anime/episodes/{id}?page={page}"
+MYANIMELIST_CACHE_TIME = CACHE_1HOUR * 24 * 7
+
+
 # TVDB V2 API
 TVDB_BASE_URL = 'https://thetvdb.com'
 TVDB_V2_PROXY_SITE = 'https://tvdb2.plex.tv'
@@ -211,7 +221,8 @@ def metadata_people(people_list, meta_people_obj):
         new_person_obj = meta_people_obj.new()
         new_person_obj.name = person.get('name', '')
         new_person_obj.role = person.get('role', '')
-        new_person_obj.photo = TVDB_IMG_ROOT % person.get('image', '')
+        # TODO: enable photos from tvdb in place of MAL as a fallback
+        new_person_obj.photo = person.get('image', '')
 
   except Exception, e:
     pass
@@ -260,6 +271,8 @@ class TVDBAgent(Agent.TV_Shows):
         if pct > minPercentThreshold:
           try:
             series_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_SERIES_URL % (guid, lang), additionalHeaders={'Accept-Language': lang}))['data']
+            Log("####LOG SERIES DATA#####")
+            Log(series_data)
             name = series_data['seriesName']
 
             if '403: series not permitted' in name.lower():
@@ -368,6 +381,7 @@ class TVDBAgent(Agent.TV_Shows):
   def exact_tvdb_match(self, mediaShowYear, media, results, lang='en'):
     Log('Searching for exact match with: %s (lang: %s)' % (mediaShowYear, lang))
     series_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_SEARCH_URL % mediaShowYear, additionalHeaders={'Accept-Language': lang}, cacheTime=0))['data'][0]
+    Log(series_data)
     series_name = series_data['seriesName']
     return self.ParseSeries(media, series_data, lang, results, 80)
 
@@ -535,7 +549,7 @@ class TVDBAgent(Agent.TV_Shows):
     series_name = series_data.get('seriesName', '')
     series_lang = lang
     Log('Scoring result: %s (%s)' % (series_name, series_id))
-    
+
     if series_name.lower().strip() == media.show.lower().strip():
       score += 10
     elif series_name[:series_name.rfind('(')].lower().strip() == media.show.lower().strip():
@@ -777,6 +791,40 @@ class TVDBAgent(Agent.TV_Shows):
       metadata.extras.add(extra['extra'])
 
     Log('%s - Added %d of %d extras.' % (ivaNormTitle, len(extras), len(xml.xpath('./extra'))))
+  def transpose_cast(self, title, lang, series_id):
+    mal_search_url = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_SEARCH.format(title=String.Quote(str(title), usePlus=True))
+
+    mal_data = JSON.ObjectFromString(HTTP.Request(mal_search_url, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
+
+    mal_id = mal_data[0]['id']
+    mal_actor_searchUrl = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_CAST.format(id=mal_id)
+
+    mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
+    transposed_actors = []
+
+    for actor in mal_actor_metadata.items():
+      if 'Characters' in actor:
+        for a in actor[1]:
+
+          if 'actors' in a:
+
+            for b in a['actors']:
+              if b['language'].lower() == 'English'.lower():
+                  character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(b['name'].split(', '))),
+                                        'image': b['image'],
+                                        'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
+                                        'sortOrder': 0, 'id': a['id']}
+                  transposed_actors.append(character_metadata)
+          else:
+            character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(a['name'].split(', '))),
+                                  'image': a['image'],
+                                  'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
+                                  'sortOrder': 0, 'id': a['id']}
+
+            transposed_actors.append(character_metadata)
+
+
+    return transposed_actors
 
   def update(self, metadata, media, lang, force=False):
     Log("def update()")
@@ -790,14 +838,14 @@ class TVDBAgent(Agent.TV_Shows):
       Log("Bad series data, no update for TVDB id: %s (lang: %s)" % (metadata.id, lang))
       # TODO: Add function to search TMDb by name
       pass
-      
+
     # Find TheMovieDB match.
     try:
       TMDB_BASE_URL = 'http://127.0.0.1:32400/services/tmdb?uri=%s'
       url = '/find/' + metadata.id + '?external_source=tvdb_id'
       tmdb_dict = JSON.ObjectFromURL(TMDB_BASE_URL % String.Quote(url, True), sleep=2.0, headers={'Accept': 'application/json'}, cacheTime=0 if force else CACHE_1MONTH)
       tmdb_id = tmdb_dict['tv_results'][0]['id']
-      
+
       url = '/tv/%s/recommendations' % tmdb_id
       tmdb_dict = JSON.ObjectFromURL(TMDB_BASE_URL % String.Quote(url, True), sleep=2.0, headers={'Accept': 'application/json'}, cacheTime=0 if force else CACHE_1MONTH)
 
@@ -824,13 +872,14 @@ class TVDBAgent(Agent.TV_Shows):
       Log("Bad English series data, no update for TVDB id: %s" % metadata.id)
       # TODO: Add function to search TMDb by name
       return
-
+    Log("MOTHERFUCKING METADATA ID:" + metadata.id)
     actor_data = None
+    self.transpose_cast(metadata.title, lang, metadata.id)
     try:
-      actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
-
-      Log("asdfasdf: %s" % actor_data)
-      Log("rolez: %s" % metadata.roles)
+      # actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
+      actor_data = self.transpose_cast(metadata.title, lang, metadata.id)
+      # Log("asdfasdf: %s" + actor_data)
+      # Log("rolez: %s" % metadata.roles)
     except Exception, e:
       Log("Bad actor data, no update for TVDB id: %s" % metadata.id)
 
