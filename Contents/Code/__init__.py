@@ -808,7 +808,7 @@ class TVDBAgent(Agent.TV_Shows):
                                       'image': a['image'],
                                       'imageAuthor': None, 'role': ' '.join(reversed(a['name'].split(', '))),
                                       'sortOrder': 0, 'id': a['id']}
-            transposed_actors.append(character_metadata)
+                transposed_actors.append(character_metadata)
           else:
             character_metadata = {'seriesId': 357488, 'name': ' '.join(reversed(a['name'].split(', '))),
                                   'image': a['image'],
