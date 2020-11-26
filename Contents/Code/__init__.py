@@ -10,6 +10,16 @@ META_TVDB_GUID_SEARCH = '%s/tv/guid/' % META_HOST
 META_TVDB_QUICK_SEARCH = '%s/tv/names/' % META_HOST
 META_TVDB_TITLE_SEARCH = '%s/tv/titles/' % META_HOST
 
+# MAL
+
+MYANIMELIST_URL_MAIN = "https://atarashii.fribbtastic.net"
+MYANIMELIST_URL_SEARCH = "/web/2.1/anime/search?q={title}"
+MYANIMELIST_URL_DETAILS = "/web/2.1/anime/{id}"
+MYANIMELIST_URL_CAST = "/web/2.1/anime/cast/{id}"
+MYANIMELIST_URL_EPISODES = "/web/2.1/anime/episodes/{id}?page={page}"
+MYANIMELIST_CACHE_TIME = CACHE_1HOUR * 24 * 7
+
+
 # TVDB V2 API
 TVDB_BASE_URL = 'https://thetvdb.com'
 TVDB_V2_PROXY_SITE = 'https://tvdb2.plex.tv'
@@ -777,6 +787,33 @@ class TVDBAgent(Agent.TV_Shows):
       metadata.extras.add(extra['extra'])
 
     Log('%s - Added %d of %d extras.' % (ivaNormTitle, len(extras), len(xml.xpath('./extra'))))
+  def transpose_cast(self, title, lang, series_id):
+    transposed_actors = []
+    mal_search_url = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_SEARCH.format(title=String.Quote(metadata.title, usePlus=True))
+
+    mal_data = JSON.ObjectFromString(HTTP.Request(mal_search_url, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
+
+    mal_id = mal_data[0]['id']
+    mal_actor_searchUrl = MYANIMELIST_URL_MAIN + MYANIMELIST_URL_CAST.format(id=mal_id)
+
+    mal_actor_metadata = JSON.ObjectFromString(HTTP.Request(mal_actor_searchUrl, sleep=2.0, cacheTime=MYANIMELIST_CACHE_TIME).content)
+
+    for actor in mal_actor_metadata['Characters']:
+      if 'actors' in actor:
+        for a in actor['actors']:
+          if a['language'].lower() == lang.lower():
+            character_metadata = {'seriesId': series_id, 'name': ' '.join(reversed(a['name'].split(', '))),
+                                  'image': a['image'],
+                                  'imageAuthor': None, 'role': ' '.join(reversed(actor['name'].split(', '))),
+                                  'sortOrder': 0, 'id': actor['id']}
+      else:
+        character_metadata = {'seriesId': series_id, 'name': ' '.join(reversed(actor['name'].split(', '))),
+                              'image': actor['image'],
+                              'imageAuthor': None, 'role': ' '.join(reversed(actor['name'].split(', '))),
+                              'sortOrder': 0, 'id': actor['id']}
+
+      transposed_actors.append(character_metadata)
+    return transposed_actors
 
   def update(self, metadata, media, lang, force=False):
     Log("def update()")
@@ -827,8 +864,8 @@ class TVDBAgent(Agent.TV_Shows):
 
     actor_data = None
     try:
-      actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
-
+      # actor_data = JSON.ObjectFromString(GetResultFromNetwork(TVDB_ACTORS_URL % metadata.id, cacheTime=0 if force else CACHE_1WEEK))['data']
+      actor_data = self.transpose_cast(metadata.title, lang, metadata.id)
       Log("asdfasdf: %s" % actor_data)
       Log("rolez: %s" % metadata.roles)
     except Exception, e:
